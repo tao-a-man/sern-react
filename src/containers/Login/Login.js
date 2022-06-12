@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { push } from 'connected-react-router';
 
 import * as actions from '../../store/actions';
+import { userService } from '../../services';
 import './Login.scss';
 
 class Login extends Component {
@@ -12,6 +13,7 @@ class Login extends Component {
             username: '',
             password: '',
             isShowPassword: false,
+            errMessage: '',
         };
     }
     handleChangeUsername = (event) => {
@@ -26,8 +28,27 @@ class Login extends Component {
         });
     };
 
-    handleOnClick = () => {
-        console.log('username', this.state.username, 'password', this.state.password);
+    handleOnClick = async (event) => {
+        this.setState({
+            errMessage: '',
+        });
+        try {
+            const respon = await userService(this.state.username, this.state.password);
+            if (respon && respon.errCode !== 0) {
+                this.setState({
+                    errMessage: respon.errMessage,
+                });
+            } else if (respon && respon.errCode == 0) {
+                this.props.userLoginSuccess(respon.user);
+                console.log(respon.user);
+            }
+        } catch (err) {
+            if (err.response.data) {
+                this.setState({
+                    errMessage: err.response.data.errMessage,
+                });
+            }
+        }
     };
 
     handleClickEye = () => {
@@ -87,6 +108,7 @@ class Login extends Component {
                         <button type="button" className="btn btn-primary btn-login" onClick={this.handleOnClick}>
                             Login
                         </button>
+                        <span style={{ color: 'red' }}>{this.state.errMessage}</span>
                         <span className="forgot-password">Forgot your password?</span>
                         <span className="sign-or">Or sign in with:</span>
                         <div className="socal-media">
@@ -109,8 +131,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         navigate: (path) => dispatch(push(path)),
-        adminLoginSuccess: (adminInfo) => dispatch(actions.adminLoginSuccess(adminInfo)),
-        adminLoginFail: () => dispatch(actions.adminLoginFail()),
+        userLoginSuccess: (userInfo) => dispatch(actions.userLoginSuccess(userInfo)),
+        // adminLoginFail: () => dispatch(actions.adminLoginFail()),
     };
 };
 
