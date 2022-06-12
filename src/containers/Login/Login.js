@@ -33,7 +33,7 @@ class Login extends Component {
             errMessage: '',
         });
         try {
-            const respon = await userService(this.state.username, this.state.password);
+            const respon = await userService.userServiceLogin(this.state.username, this.state.password);
             if (respon && respon.errCode !== 0) {
                 this.setState({
                     errMessage: respon.errMessage,
