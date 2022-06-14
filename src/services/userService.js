@@ -9,6 +9,10 @@ const userService = (function userService() {
             const respon = await axios.get(`/api/get-user?id=${id}`);
             return respon;
         },
+        async userServiceCreateUser(data) {
+            const respon = await axios.post('/api/create-user', { ...data });
+            return respon;
+        },
     };
 })();
 
