@@ -3,13 +3,12 @@ import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Button from '../../components/Button';
 import swal from 'sweetalert';
 
-class UserModal extends React.Component {
+class UserEditModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            id: '',
             email: '',
-            password: '',
-            passwordConfirm: '',
             firstName: '',
             lastName: '',
             address: '',
@@ -17,6 +16,16 @@ class UserModal extends React.Component {
             gender: '',
             roleId: '',
         };
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const data = nextProps.isEditModal;
+        if (nextState.id !== data.user.id && data.type) {
+            for (const state in nextState) {
+                nextState[state] = data.user[state];
+            }
+        }
+        return true;
     }
 
     toggle = () => {
@@ -32,27 +41,38 @@ class UserModal extends React.Component {
 
     handleValidateForm = () => {
         for (let key in this.state) {
-            if (this.state[key].trim() === '') {
-                return { type: false, errMessage: 'Invalid Form' };
+            if (this.state[key].toString().trim() === '') {
+                return { type: false, errMessage: 'Invalid form' };
             }
-        }
-        if (this.state.password !== this.state.passwordConfirm) {
-            return { type: false, errMessage: 'Password Confirm not match' };
         }
         return { type: true, errMessage: 'Valid Form Success' };
     };
 
-    handleCreateUserModal = async () => {
+    handleResetState = () => {
+        this.setState({
+            id: '',
+            email: '',
+            firstName: '',
+            lastName: '',
+            address: '',
+            phoneNumber: '',
+            gender: '',
+            roleId: '',
+        });
+    };
+
+    handleCreateUserEditModal = async () => {
         const valid = this.handleValidateForm();
         if (valid.type) {
             const user = this.state;
-            delete user.passwordConfirm;
-            const respon = await this.props.handleCreateUser(user);
+            const respon = await this.props.handleEditUser(user);
             if (respon.errCode === 0) {
                 swal({
-                    title: 'Create Success!',
+                    title: 'Edit Success!',
                     icon: 'success',
                 });
+                this.handleResetState();
+                this.toggle();
             } else {
                 swal({
                     title: 'Error',
@@ -72,15 +92,17 @@ class UserModal extends React.Component {
     render() {
         return (
             <div>
-                <Modal size="lg" isOpen={this.props.isShowModal} toggle={this.toggle}>
+                <Modal size="lg" isOpen={this.props.isEditModal.type} toggle={this.toggle}>
                     <ModalHeader>
-                        <h1>CREATE FORM</h1>
+                        <b>EDIT FORM</b>
                     </ModalHeader>
                     <ModalBody>
                         <div className="row">
-                            <div className="form-group col-4">
+                            <input value={this.state.id} hidden disabled></input>
+                            <div className="form-group col-12">
                                 <label htmlFor="inputEmail4">Email</label>
                                 <input
+                                    value={this.state.email}
                                     type="email"
                                     className="form-control"
                                     name="email"
@@ -89,32 +111,10 @@ class UserModal extends React.Component {
                                     onChange={(e) => this.handleChangeInput(e)}
                                 />
                             </div>
-                            <div className="form-group col-4">
-                                <label htmlFor="inputPassword4">Password</label>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    name="password"
-                                    id="inputPassword4"
-                                    placeholder="Password"
-                                    onChange={(e) => this.handleChangeInput(e)}
-                                />
-                            </div>
-
-                            <div className="form-group col-4">
-                                <label htmlFor="inputPassword5">Confirm Password</label>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    name="passwordConfirm"
-                                    id="inputPassword5"
-                                    placeholder="Confirm Password"
-                                    onChange={(e) => this.handleChangeInput(e)}
-                                />
-                            </div>
                             <div className="form-group col-6">
                                 <label htmlFor="firstName">First Name</label>
                                 <input
+                                    value={this.state.firstName}
                                     type="text"
                                     className="form-control"
                                     name="firstName"
@@ -126,6 +126,7 @@ class UserModal extends React.Component {
                             <div className="form-group col-6">
                                 <label htmlFor="LastName">Last Name</label>
                                 <input
+                                    value={this.state.lastName}
                                     type="text"
                                     className="form-control"
                                     name="lastName"
@@ -138,6 +139,7 @@ class UserModal extends React.Component {
                         <div className="form-group">
                             <label htmlFor="inputAddress">Address</label>
                             <input
+                                value={this.state.address}
                                 type="text"
                                 className="form-control"
                                 name="address"
@@ -150,23 +152,25 @@ class UserModal extends React.Component {
                             <div className="form-group col-4">
                                 <label htmlFor="inputPhone">Phone Number</label>
                                 <input
+                                    value={this.state.phoneNumber}
                                     className="form-control"
                                     type="text"
                                     id="inputPhone"
                                     name="phoneNumber"
+                                    placeholder="Enter your phone number"
                                     onChange={(e) => this.handleChangeInput(e)}
                                 />
                             </div>
                             <div className="form-group col-4">
                                 <label htmlFor="inputStateGender">Gender</label>
                                 <select
-                                    defaultValue=""
+                                    defaultValue="default"
                                     id="inputStateGender"
                                     className="form-control"
                                     name="gender"
                                     onChange={(e) => this.handleChangeInput(e)}
                                 >
-                                    <option value="" hidden disabled>
+                                    <option value={!this.state.gender && 'default'} hidden disabled>
                                         Choose Gender
                                     </option>
                                     <option value="1">Male</option>
@@ -177,13 +181,13 @@ class UserModal extends React.Component {
                             <div className="form-group col-4">
                                 <label htmlFor="inputStateRole">Role</label>
                                 <select
-                                    defaultValue=""
+                                    defaultValue="default"
                                     id="inputStateRole"
                                     className="form-control"
                                     name="roleId"
                                     onChange={(e) => this.handleChangeInput(e)}
                                 >
-                                    <option value="" hidden disabled>
+                                    <option value={!this.state.roleId && 'default'} hidden disabled>
                                         Choose Role
                                     </option>
                                     <option value="1">Admin</option>
@@ -204,13 +208,13 @@ class UserModal extends React.Component {
                             Cancel
                         </Button>
                         <Button
-                            onClick={this.handleCreateUserModal}
+                            onClick={this.handleCreateUserEditModal}
                             small
                             iconLeft={<i className="fas fa-check"></i>}
                             primary
                             type="submit"
                         >
-                            Create
+                            Edit User
                         </Button>
                     </ModalFooter>
                 </Modal>
@@ -219,4 +223,4 @@ class UserModal extends React.Component {
     }
 }
 
-export default UserModal;
+export default UserEditModal;

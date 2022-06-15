@@ -13,6 +13,14 @@ const userService = (function userService() {
             const respon = await axios.post('/api/create-user', { ...data });
             return respon;
         },
+        async userServiceDeleteUser(id) {
+            const respon = await axios.delete('/api/delete-user', { data: { id } });
+            return respon;
+        },
+        async userServiceEditUser(data) {
+            const respon = await axios.put('/api/update-user', { ...data });
+            return respon;
+        },
     };
 })();
 

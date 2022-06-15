@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
+import swal from 'sweetalert';
 
 import './UserManage.scss';
 import { userService } from '../../services';
 import Button from '../../components/Button';
-import UserModal from './UserModal';
+import UserCreateModal from './UserCreateModal';
+import UserEditModal from './UserEditModal';
 
 class UserManage extends Component {
     constructor(props) {
         super(props);
-        this.state = { users: [], isShowModal: false };
+        this.state = { users: [], isShowModal: false, isEditModal: { type: false, user: {} } };
     }
     componentDidMount() {
         this.getUsers();
@@ -24,22 +26,43 @@ class UserManage extends Component {
     handleSetShowModal = () => {
         this.setState({ isShowModal: true });
     };
-    handleToggleModal = () => {
+    handleToggleCreateModal = () => {
         this.setState({ isShowModal: !this.state.isShowModal });
+    };
+    handleToggleEditModal = () => {
+        this.setState({ isEditModal: { ...this.state.isEditModal, type: !this.state.isEditModal.type } });
+    };
+    handleShowEditModal = (user) => {
+        this.setState({ isEditModal: { type: true, user: user } });
     };
     handleCreateUser = async (data) => {
         const respon = await userService.userServiceCreateUser(data);
         this.getUsers();
         return respon;
     };
+    handleDeleteUser = async (id) => {
+        const respon = await userService.userServiceDeleteUser(id);
+        this.getUsers();
+        return respon;
+    };
+    handleEditUser = async (data) => {
+        const respon = await userService.userServiceEditUser(data);
+        this.getUsers();
+        return respon;
+    };
     render() {
         return (
             <div className="mx-3">
-                <UserModal
+                <UserCreateModal
                     handleCreateUser={this.handleCreateUser}
-                    toggle={this.handleToggleModal}
+                    toggle={this.handleToggleCreateModal}
                     isShowModal={this.state.isShowModal}
-                ></UserModal>
+                ></UserCreateModal>
+                <UserEditModal
+                    handleEditUser={this.handleEditUser}
+                    toggle={this.handleToggleEditModal}
+                    isEditModal={this.state.isEditModal}
+                ></UserEditModal>
                 <h1>USER MANAGEMENT</h1>
                 <Button onClick={this.handleSetShowModal} small primary iconLeft={<i className="fas fa-plus"></i>}>
                     Create User
@@ -64,20 +87,18 @@ class UserManage extends Component {
                                         <td>{user.lastName}</td>
                                         <td>{user.address}</td>
                                         <td>
-                                            <a
-                                                href="/crud-edit?id=<%= data[i].id %>"
-                                                type="button"
+                                            <button
+                                                onClick={(e) => this.handleShowEditModal(user)}
                                                 className="btn btn-primary btn-custom"
                                             >
                                                 Edit
-                                            </a>
-                                            <a
-                                                href="/crud-delete?id=<%= data[i].id %>"
-                                                type="button"
+                                            </button>
+                                            <button
+                                                onClick={(e) => this.handleDeleteUser(user.id)}
                                                 className="btn btn-danger btn-custom"
                                             >
                                                 Delete
-                                            </a>
+                                            </button>
                                         </td>
                                     </tr>
                                 );
