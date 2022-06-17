@@ -56,7 +56,7 @@
 }
 
 .primary {
-    background-color: rgb(25, 0, 255);
+    background-color: var(--primary-color);
     color: #fff;
 
     &:hover {

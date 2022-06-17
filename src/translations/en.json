@@ -1,4 +1,8 @@
 {
+    "homeHeader": {
+        "specialist": "Specialist",
+        "specialistSubtitle": "Find a doctor by specialty"
+    },
     "common": {
         "add": "Add",
         "edit": "Edit",

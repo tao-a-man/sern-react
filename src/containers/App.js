@@ -13,9 +13,9 @@ import Home from '../routes/Home';
 import Login from './Login/Login';
 import Header from './Header/Header';
 import System from '../routes/System';
-import HomePage from './HomePage';
-
+import HomePage from './HomePage/HomePage';
 import { CustomToastCloseButton } from '../components/CustomToast';
+import CustomScrollbars from '../components/CustomScrollbars';
 
 class App extends Component {
     handlePersistorState = () => {
@@ -40,31 +40,31 @@ class App extends Component {
         return (
             <Fragment>
                 <Router history={history}>
-                    <div className="main-container">
-                        {this.props.isLoggedIn && <Header />}
+                    <CustomScrollbars style={{ width: '100vw', height: '100vh' }}>
+                        <div className="main-container">
+                            <span className="content-container">
+                                <Switch>
+                                    <Route path={path.HOME} exact component={Home} />
+                                    <Route path={path.LOGIN} component={userIsNotAuthenticated(Login)} />
+                                    <Route path={path.SYSTEM} component={userIsAuthenticated(System)} />
+                                    <Route path={path.HOMEPAGE} component={HomePage} />
+                                </Switch>
+                            </span>
 
-                        <span className="content-container">
-                            <Switch>
-                                <Route path={path.HOME} exact component={Home} />
-                                <Route path={path.LOGIN} component={userIsNotAuthenticated(Login)} />
-                                <Route path={path.SYSTEM} component={userIsAuthenticated(System)} />
-                                <Route path={path.HOMEPAGE} component={System} />
-                            </Switch>
-                        </span>
-
-                        <ToastContainer
-                            className="toast-container"
-                            toastClassName="toast-item"
-                            bodyClassName="toast-item-body"
-                            autoClose={false}
-                            hideProgressBar={true}
-                            pauseOnHover={false}
-                            pauseOnFocusLoss={true}
-                            closeOnClick={false}
-                            draggable={false}
-                            closeButton={<CustomToastCloseButton />}
-                        />
-                    </div>
+                            <ToastContainer
+                                className="toast-container"
+                                toastClassName="toast-item"
+                                bodyClassName="toast-item-body"
+                                autoClose={false}
+                                hideProgressBar={true}
+                                pauseOnHover={false}
+                                pauseOnFocusLoss={true}
+                                closeOnClick={false}
+                                draggable={false}
+                                closeButton={<CustomToastCloseButton />}
+                            />
+                        </div>
+                    </CustomScrollbars>
                 </Router>
             </Fragment>
         );
