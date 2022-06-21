@@ -6,6 +6,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 import Button from '../../../components/Button';
+import Slideritem from '../../../components/SliderItem/SliderItem';
 import './HomeSection.scss';
 
 function SampleNextArrow(props) {
@@ -38,9 +39,9 @@ class HomeSection extends Component {
             accessibility: true,
             dots: true,
             infinite: true,
-            slidesToShow: 3,
+            slidesToShow: 4,
             slidesToScroll: 1,
-            autoplay: true,
+            // autoplay: true,
             speed: 2000,
             autoplaySpeed: 3000,
             cssEase: 'linear',
@@ -50,24 +51,26 @@ class HomeSection extends Component {
         return (
             <div className="section">
                 <Slider {...settings}>
-                    <div>
-                        <h3>1</h3>
-                    </div>
-                    <div>
-                        <h3>2</h3>
-                    </div>
-                    <div>
-                        <h3>3</h3>
-                    </div>
-                    <div>
-                        <h3>4</h3>
-                    </div>
-                    <div>
-                        <h3>5</h3>
-                    </div>
-                    <div>
-                        <h3>6</h3>
-                    </div>
+                    <Slideritem
+                        title="Cơ xương khớp"
+                        img="https://cdn.bookingcare.vn/fr/w300/2019/12/13/120331-co-xuong-khop.jpg"
+                    ></Slideritem>
+                    <Slideritem
+                        title="Cơ xương khớp"
+                        img="https://cdn.bookingcare.vn/fr/w300/2019/12/13/120331-co-xuong-khop.jpg"
+                    ></Slideritem>
+                    <Slideritem
+                        title="Cơ xương khớp"
+                        img="https://cdn.bookingcare.vn/fr/w300/2019/12/13/120331-co-xuong-khop.jpg"
+                    ></Slideritem>
+                    <Slideritem
+                        title="Cơ xương khớp"
+                        img="https://cdn.bookingcare.vn/fr/w300/2019/12/13/120331-co-xuong-khop.jpg"
+                    ></Slideritem>
+                    <Slideritem
+                        title="Cơ xương khớp"
+                        img="https://cdn.bookingcare.vn/fr/w300/2019/12/13/120331-co-xuong-khop.jpg"
+                    ></Slideritem>
                 </Slider>
             </div>
         );
