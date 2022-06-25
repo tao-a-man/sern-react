@@ -21,6 +21,10 @@ const userService = (function userService() {
             const respon = await axios.put('/api/update-user', { ...data });
             return respon;
         },
+        async getAllCodeByType(type) {
+            const respon = await axios.get(`/api/get-allcode?type=${type}`);
+            return respon;
+        },
     };
 })();
 

@@ -1,7 +1,11 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Button from '../../components/Button';
 import swal from 'sweetalert';
+import * as actions from '../../store/actions';
+import Lightbox from 'react-image-lightbox';
+import 'react-image-lightbox/style.css';
 
 class UserCreateModal extends React.Component {
     constructor(props) {
@@ -16,7 +20,13 @@ class UserCreateModal extends React.Component {
             phoneNumber: '',
             gender: '',
             roleId: '',
+            previewImg: '',
+            isOpenPreview: false,
         };
+    }
+
+    componentDidMount() {
+        this.props.fetchGenderStart();
     }
 
     toggle = () => {
@@ -32,8 +42,10 @@ class UserCreateModal extends React.Component {
 
     handleValidateForm = () => {
         for (let key in this.state) {
-            if (this.state[key].trim() === '') {
-                return { type: false, errMessage: 'Invalid Form' };
+            if (key !== 'isOpenPreview') {
+                if (this.state[key].trim() === '') {
+                    return { type: false, errMessage: 'Invalid Form' };
+                }
             }
         }
         if (this.state.password !== this.state.passwordConfirm) {
@@ -53,13 +65,15 @@ class UserCreateModal extends React.Component {
             phoneNumber: '',
             gender: '',
             roleId: '',
+            previewImg: '',
+            isOpenPreview: false,
         });
     };
 
     handleCreateUserOfModal = async () => {
         const valid = this.handleValidateForm();
         if (valid.type) {
-            const user = this.state;
+            const user = { ...this.state };
             delete user.passwordConfirm;
             const respon = await this.props.handleCreateUser(user);
             if (respon.errCode === 0) {
@@ -84,10 +98,18 @@ class UserCreateModal extends React.Component {
         }
     };
 
+    handleChangeInputImg = (e) => {
+        const data = e.target.files;
+        const avatar = URL.createObjectURL(data[0]);
+        this.setState({ previewImg: avatar });
+    };
+
     render() {
+        const genders = this.props.gender;
+        console.log(this.state);
         return (
             <div>
-                <Modal size="lg" isOpen={this.props.isShowModal} toggle={this.toggle}>
+                <Modal zIndex="2" size="lg" isOpen={this.props.isShowModal} toggle={this.toggle}>
                     <ModalHeader>
                         <b>CREATE FORM</b>
                     </ModalHeader>
@@ -155,19 +177,19 @@ class UserCreateModal extends React.Component {
                                 />
                             </div>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="inputAddress">Address</label>
-                            <input
-                                value={this.state.address}
-                                type="text"
-                                className="form-control"
-                                name="address"
-                                id="inputAddress"
-                                placeholder="Enter your address"
-                                onChange={(e) => this.handleChangeInput(e)}
-                            />
-                        </div>
                         <div className="row">
+                            <div className="form-group col-8">
+                                <label htmlFor="inputAddress">Address</label>
+                                <input
+                                    value={this.state.address}
+                                    type="text"
+                                    className="form-control"
+                                    name="address"
+                                    id="inputAddress"
+                                    placeholder="Enter your address"
+                                    onChange={(e) => this.handleChangeInput(e)}
+                                />
+                            </div>
                             <div className="form-group col-4">
                                 <label htmlFor="inputPhone">Phone Number</label>
                                 <input
@@ -183,18 +205,23 @@ class UserCreateModal extends React.Component {
                             <div className="form-group col-4">
                                 <label htmlFor="inputStateGender">Gender</label>
                                 <select
-                                    defaultValue="default"
+                                    value="123"
                                     id="inputStateGender"
                                     className="form-control"
                                     name="gender"
                                     onChange={(e) => this.handleChangeInput(e)}
                                 >
-                                    <option value={!this.state.gender && 'default'} hidden disabled>
+                                    <option value="123" hidden disabled>
                                         Choose Gender
                                     </option>
-                                    <option value="1">Male</option>
-                                    <option value="2">Female</option>
-                                    <option value="3">Other</option>
+                                    {genders.length > 0 &&
+                                        genders.map((gender, index) => {
+                                            return (
+                                                <option key={index} value={gender.key}>
+                                                    {gender.valueVi}
+                                                </option>
+                                            );
+                                        })}
                                 </select>
                             </div>
                             <div className="form-group col-4">
@@ -213,6 +240,53 @@ class UserCreateModal extends React.Component {
                                     <option value="2">Doctor</option>
                                     <option value="3">Patient</option>
                                 </select>
+                            </div>
+                            <div className="form-group col-4">
+                                <label htmlFor="inputStateImg">Avatar</label>
+
+                                <div style={{ display: 'flex' }}>
+                                    <label htmlFor="inputStateImg">
+                                        <div
+                                            style={{
+                                                fontSize: '22px',
+                                                backgroundColor: '#ccc',
+                                                borderRadius: '4px',
+                                                width: '100px',
+                                                height: '34px',
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            <i className="fas fa-upload"></i>
+                                            Tải lên
+                                        </div>
+                                    </label>
+                                    <div
+                                        style={{
+                                            marginLeft: '4px',
+                                            border: '1px solid #ccc',
+                                            height: '74px',
+                                            width: '138px',
+                                            background: `url('${this.state.previewImg}') center center / contain no-repeat`,
+                                        }}
+                                        onClick={() => {
+                                            if (this.state.previewImg === '') return;
+                                            this.setState({ isOpenPreview: true });
+                                        }}
+                                    ></div>
+                                </div>
+                                {this.state.isOpenPreview && (
+                                    <Lightbox
+                                        mainSrc={this.state.previewImg}
+                                        reactModalStyle={{ zIndex: '2000' }}
+                                        onCloseRequest={() => this.setState({ isOpenPreview: false })}
+                                    />
+                                )}
+                                <input
+                                    onChange={(e) => this.handleChangeInputImg(e)}
+                                    id="inputStateImg"
+                                    type="file"
+                                    hidden
+                                ></input>
                             </div>
                         </div>
                     </ModalBody>
@@ -241,5 +315,16 @@ class UserCreateModal extends React.Component {
         );
     }
 }
+const mapStateToProps = (state) => {
+    return {
+        gender: state.admin.gender,
+    };
+};
 
-export default UserCreateModal;
+const mapDispatchToProps = (dispatch) => {
+    return {
+        fetchGenderStart: () => dispatch(actions.fetchGenderStart()),
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserCreateModal);
