@@ -11,7 +11,7 @@ import Header from '../../containers/Header/Header';
 class UserManage extends Component {
     constructor(props) {
         super(props);
-        this.state = { users: [], isShowModal: false, isEditModal: { type: false, user: {} } };
+        this.state = { users: [], isShowModal: false, isEditModal: { type: false, user: {} }, toggleAbc: false };
     }
     componentDidMount() {
         this.getUsers();
@@ -19,7 +19,13 @@ class UserManage extends Component {
     async getUsers() {
         try {
             const users = await userService.userServiceGetUser('ALL');
-            this.setState({ users: users.user });
+            const newuser = users.user.map((user, index) => {
+                if (user.image) {
+                    user.image = new Buffer(user.image.data, 'base64').toString('binary');
+                }
+                return user;
+            });
+            this.setState({ users: newuser });
         } catch (e) {
             console.log('erroo', e);
         }
@@ -109,6 +115,14 @@ class UserManage extends Component {
                         </tbody>
                     </table>
                 </div>
+                <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                        this.setState({ toggleAbc: !this.state.toggleAbc });
+                    }}
+                >
+                    abc
+                </button>
             </>
         );
     }

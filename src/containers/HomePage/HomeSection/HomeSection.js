@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -29,22 +28,18 @@ function SamplePrevArrow(props) {
     );
 }
 
-class HomeSection extends Component {
+class HomeSection extends React.PureComponent {
     handleChangeLanguage = (language) => {
         this.props.changeLanguageHeader(language);
     };
 
     render() {
         const settings = {
-            accessibility: true,
             dots: true,
             infinite: true,
+            speed: 500,
             slidesToShow: 4,
             slidesToScroll: 1,
-            // autoplay: true,
-            speed: 2000,
-            autoplaySpeed: 3000,
-            cssEase: 'linear',
             nextArrow: <SampleNextArrow />,
             prevArrow: <SamplePrevArrow />,
         };

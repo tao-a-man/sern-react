@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import './SliderItem.scss';
+import { connect } from 'react-redux';
+import * as actions from '../../store/actions';
 
-class SldierItem extends Component {
+class SldierItem extends React.PureComponent {
     constructor(props) {
         super(props);
     }
     render() {
-        console.log(this.props);
         return (
             <div className="slider-item">
                 <img className="slider-img" src={this.props.img}></img>
@@ -16,4 +17,14 @@ class SldierItem extends Component {
     }
 }
 
-export default SldierItem;
+const mapStateToProps = (state) => {
+    return {};
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        // setContentOfConfirmModal: (contentOfConfirmModal) => dispatch(actions.setContentOfConfirmModal(contentOfConfirmModal))
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SldierItem);

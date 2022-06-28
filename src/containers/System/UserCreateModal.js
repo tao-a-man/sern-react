@@ -6,8 +6,9 @@ import swal from 'sweetalert';
 import * as actions from '../../store/actions';
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css';
+import { CommonUtils } from '../../utils';
 
-class UserCreateModal extends React.Component {
+class UserCreateModal extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -21,6 +22,7 @@ class UserCreateModal extends React.Component {
             gender: '',
             roleId: '',
             previewImg: '',
+            image: '',
             isOpenPreview: false,
         };
     }
@@ -66,6 +68,7 @@ class UserCreateModal extends React.Component {
             gender: '',
             roleId: '',
             previewImg: '',
+            image: '',
             isOpenPreview: false,
         });
     };
@@ -98,15 +101,19 @@ class UserCreateModal extends React.Component {
         }
     };
 
-    handleChangeInputImg = (e) => {
+    handleChangeInputImg = async (e) => {
         const data = e.target.files;
-        const avatar = URL.createObjectURL(data[0]);
-        this.setState({ previewImg: avatar });
+        const avatarPreview = URL.createObjectURL(data[0]);
+        const image = await CommonUtils.getBase64(data[0]);
+        this.setState({
+            previewImg: avatarPreview,
+            image: image,
+        });
     };
 
     render() {
         const genders = this.props.gender;
-        console.log(this.state);
+        console.log('create', this.props);
         return (
             <div>
                 <Modal zIndex="2" size="lg" isOpen={this.props.isShowModal} toggle={this.toggle}>
@@ -205,19 +212,19 @@ class UserCreateModal extends React.Component {
                             <div className="form-group col-4">
                                 <label htmlFor="inputStateGender">Gender</label>
                                 <select
-                                    value="123"
+                                    defaultValue="default"
                                     id="inputStateGender"
                                     className="form-control"
                                     name="gender"
                                     onChange={(e) => this.handleChangeInput(e)}
                                 >
-                                    <option value="123" hidden disabled>
+                                    <option value={!this.state.gender && 'default'} hidden disabled>
                                         Choose Gender
                                     </option>
                                     {genders.length > 0 &&
                                         genders.map((gender, index) => {
                                             return (
-                                                <option key={index} value={gender.key}>
+                                                <option key={index} value={gender.keyMap}>
                                                     {gender.valueVi}
                                                 </option>
                                             );
@@ -236,9 +243,9 @@ class UserCreateModal extends React.Component {
                                     <option value={!this.state.roleId && 'default'} hidden disabled>
                                         Choose Role
                                     </option>
-                                    <option value="1">Admin</option>
-                                    <option value="2">Doctor</option>
-                                    <option value="3">Patient</option>
+                                    <option value="R1">Admin</option>
+                                    <option value="R2">Doctor</option>
+                                    <option value="R3">Patient</option>
                                 </select>
                             </div>
                             <div className="form-group col-4">

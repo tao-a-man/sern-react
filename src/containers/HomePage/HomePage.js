@@ -14,9 +14,6 @@ class HomePage extends Component {
                 <HomeHeader />
                 <HomeContent />
                 <HomeSection />
-                <HomeSection />
-                <HomeSection />
-                <HomeSection />
             </div>
         );
     }
